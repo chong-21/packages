@@ -353,10 +353,7 @@ class WebViewProxyAPIDelegate: PigeonApiDelegateWKWebView, PigeonApiDelegateUIVi
         pigeonInstance.perform(Selector(("isInspectable:")), with: inspectable)
       }
     } else {
-      throw (pigeonApi.pigeonRegistrar as! ProxyAPIRegistrar)
-        .createUnsupportedVersionError(
-          method: "WKWebView.inspectable",
-          versionRequirements: "iOS 16.4, macOS 13.3")
+      print("Warning: WKWebView.isInspectable not available on this iOS version")
     }
   }
 
