@@ -348,24 +348,32 @@ class WebViewProxyAPIDelegate: PigeonApiDelegateWKWebView, PigeonApiDelegateUIVi
     pigeonApi: PigeonApiUIViewWKWebView, pigeonInstance: WKWebView, inspectable: Bool
   ) throws {
     #if os(iOS)
-      if #available(iOS 16.4, *) {
-        pigeonInstance.isInspectable = inspectable
+      // Use ObjC runtime to set the property if available at runtime.
+      let selector = NSSelectorFromString("setInspectable:")
+      let anyObj = pigeonInstance as AnyObject
+      if anyObj.responds(to: selector) {
+        // pass as NSNumber because ObjC selector expects an ObjC object
+        _ = anyObj.perform(selector, with: NSNumber(value: inspectable))
       } else {
-        print("Warning: 'isInspectable' is only available on iOS 16.4 and later.")
+        print("Warning: 'isInspectable' setter not available at runtime (SDK too old).")
       }
     #endif
   }
 
+
   func setInspectable(
     pigeonApi: PigeonApiNSViewWKWebView, pigeonInstance: WKWebView, inspectable: Bool
   ) throws {
-    // This function is for macOS. The property was also introduced in macOS 13.3.
-    if #available(macOS 13.3, *) {
-      pigeonInstance.isInspectable = inspectable
+    // macOS: do the same selector-based call for backwards-compatibility.
+    let selector = NSSelectorFromString("setInspectable:")
+    let anyObj = pigeonInstance as AnyObject
+    if anyObj.responds(to: selector) {
+      _ = anyObj.perform(selector, with: NSNumber(value: inspectable))
     } else {
-      print("Warning: 'isInspectable' is only available on macOS 13.3 and later.")
+      print("Warning: 'isInspectable' setter not available at runtime (SDK too old).")
     }
   }
+
 
   func getCustomUserAgent(pigeonApi: PigeonApiUIViewWKWebView, pigeonInstance: WKWebView) throws
     -> String?
