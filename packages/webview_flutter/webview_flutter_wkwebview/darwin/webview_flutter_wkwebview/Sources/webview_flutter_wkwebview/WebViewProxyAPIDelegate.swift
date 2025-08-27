@@ -347,15 +347,24 @@ class WebViewProxyAPIDelegate: PigeonApiDelegateWKWebView, PigeonApiDelegateUIVi
   func setInspectable(
     pigeonApi: PigeonApiUIViewWKWebView, pigeonInstance: WKWebView, inspectable: Bool
   ) throws {
-    // Temporarily disabled for Xcode 14.2 compatibility (iOS 16.2 SDK)
-    print("Warning: setInspectable method disabled due to iOS version < 16.4")
+    #if os(iOS)
+      if #available(iOS 16.4, *) {
+        pigeonInstance.isInspectable = inspectable
+      } else {
+        print("Warning: 'isInspectable' is only available on iOS 16.4 and later.")
+      }
+    #endif
   }
 
   func setInspectable(
     pigeonApi: PigeonApiNSViewWKWebView, pigeonInstance: WKWebView, inspectable: Bool
   ) throws {
-    // Temporarily disabled for Xcode 14.2 compatibility (iOS 16.2 SDK)
-    print("Warning: setInspectable method disabled due to iOS version < 16.4")
+    // This function is for macOS. The property was also introduced in macOS 13.3.
+    if #available(macOS 13.3, *) {
+      pigeonInstance.isInspectable = inspectable
+    } else {
+      print("Warning: 'isInspectable' is only available on macOS 13.3 and later.")
+    }
   }
 
   func getCustomUserAgent(pigeonApi: PigeonApiUIViewWKWebView, pigeonInstance: WKWebView) throws
